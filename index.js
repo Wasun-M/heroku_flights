@@ -13,10 +13,10 @@ app.listen(PORT, function () {
 })
 
 const db = mysql.createConnection({
-    user: "root",
-    host: "localhost",
-    password: "12345678",
-    database: "flight_information",
+    user: "sql6414467",
+    host: "sql6.freemysqlhosting.net",
+    password: "Vaqsjfwpds",
+    database: "sql6414467",
 });
 
 
