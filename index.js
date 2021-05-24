@@ -19,6 +19,15 @@ const db = mysql.createConnection({
     database: "flight_information",
 });
 
+
+const isnull = function (request) {
+    let result = true
+    if (request != '') {
+        result = false
+    }
+    return result;
+}
+
 app.get("/flights", (req, res) => {
     db.query("SELECT * FROM flights LIMIT 100", (err, result) => {
         if (err) {
@@ -29,13 +38,9 @@ app.get("/flights", (req, res) => {
     });
 });
 
-const isnull = function (request) {
-    let result = true
-    if (request != '') {
-        result = false
-    }
-    return result;
-}
+app.get("/", function (req, res) {
+    res.send(`Weleome !!`);
+})
 
 const getDayofWeekfromCarrier = function (request) {
     let queryString = `SELECT carrier,DAYOFWEEK(schedule_date) as day from flights where carrier = '${request.carrier}'`;
