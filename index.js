@@ -19,6 +19,13 @@ const db = mysql.createConnection({
     database: "sql6414467",
 });
 
+// const db = mysql.createConnection({
+//     user: "root",
+//     host: "localhost",
+//     password: "12345678",
+//     database: "flight_information",
+// });
+
 
 const isnull = function (request) {
     let result = true
