@@ -12,7 +12,8 @@ app.listen(PORT, function () {
     console.log(`server is running ${PORT}`);
 })
 
-const db = mysql.createConnection({
+const db = mysql.createPool({
+    connectionLimit: 10,
     user: "z5KeCgVHZI",
     host: "remotemysql.com",
     password: "xjp591Hsth",
