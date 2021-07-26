@@ -12,19 +12,19 @@ app.listen(PORT, function () {
     console.log(`server is running ${PORT}`);
 })
 
-// const db = mysql.createConnection({
-//     user: "z5KeCgVHZI",
-//     host: "remotemysql.com",
-//     password: "xjp591Hsth",
-//     database: "z5KeCgVHZI",
-// });
-
 const db = mysql.createConnection({
-    user: "root",
-    host: "localhost",
-    password: "12345678",
-    database: "flight_information",
+    user: "z5KeCgVHZI",
+    host: "remotemysql.com",
+    password: "xjp591Hsth",
+    database: "z5KeCgVHZI",
 });
+
+// const db = mysql.createConnection({
+//     user: "root",
+//     host: "localhost",
+//     password: "12345678",
+//     database: "flight_information",
+// });
 
 
 const isnull = function (request) {
