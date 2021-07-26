@@ -12,19 +12,19 @@ app.listen(PORT, function () {
     console.log(`server is running ${PORT}`);
 })
 
-const db = mysql.createConnection({
-    user: "z5KeCgVHZI",
-    host: "remotemysql.com",
-    password: "xjp591Hsth",
-    database: "z5KeCgVHZI",
-});
-
 // const db = mysql.createConnection({
-//     user: "root",
-//     host: "localhost",
-//     password: "12345678",
-//     database: "flight_information",
+//     user: "z5KeCgVHZI",
+//     host: "remotemysql.com",
+//     password: "xjp591Hsth",
+//     database: "z5KeCgVHZI",
 // });
+
+const db = mysql.createConnection({
+    user: "root",
+    host: "localhost",
+    password: "12345678",
+    database: "flight_information",
+});
 
 
 const isnull = function (request) {
@@ -94,7 +94,7 @@ const getDayofWeekfromAircraftType = function (request) {
 }
 
 const getAircraftTypeAndCarrieres = function () {
-    let queryString = `SELECT id ,carrier, aircraft_type FROM flights GROUP BY aircraft_type,carrier ORDER by carrier`;
+    let queryString = `SELECT carrier, aircraft_type FROM flights GROUP BY aircraft_type,carrier ORDER by carrier`;
     return new Promise((resolve, reject) => {
         db.query(queryString,
             (err, result) => {
