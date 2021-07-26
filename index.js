@@ -13,10 +13,10 @@ app.listen(PORT, function () {
 })
 
 const db = mysql.createConnection({
-    user: "sql6414467",
-    host: "sql6.freemysqlhosting.net",
-    password: "Vaqsjfwpds",
-    database: "sql6414467",
+    user: "z5KeCgVHZI",
+    host: "remotemysql.com",
+    password: "xjp591Hsth",
+    database: "z5KeCgVHZI",
 });
 
 // const db = mysql.createConnection({
