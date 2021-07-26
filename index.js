@@ -12,20 +12,44 @@ app.listen(PORT, function () {
     console.log(`server is running ${PORT}`);
 })
 
-const db = mysql.createPool({
-    connectionLimit: 10,
+const db_config = {
     user: "z5KeCgVHZI",
     host: "remotemysql.com",
     password: "xjp591Hsth",
     database: "z5KeCgVHZI",
-});
+};
 
-// const db = mysql.createConnection({
+// const db_config = {
 //     user: "root",
 //     host: "localhost",
 //     password: "12345678",
 //     database: "flight_information",
-// });
+// };
+
+var connection;
+
+function handleDisconnect() {
+    connection = mysql.createConnection(db_config); // Recreate the connection, since
+    // the old one cannot be reused.
+
+    connection.connect(function (err) {              // The server is either down
+        if (err) {                                     // or restarting (takes a while sometimes).
+            console.log('error when connecting to db:', err);
+            setTimeout(handleDisconnect, 2000); // We introduce a delay before attempting to reconnect,
+        }                                     // to avoid a hot loop, and to allow our node script to
+    });                                     // process asynchronous requests in the meantime.
+    // If you're also serving http, display a 503 error.
+    connection.on('error', function (err) {
+        console.log('db error', err);
+        if (err.code === 'PROTOCOL_CONNECTION_LOST') { // Connection to the MySQL server is usually
+            handleDisconnect();                         // lost due to either server restart, or a
+        } else {                                      // connnection idle timeout (the wait_timeout
+            throw err;                                  // server variable configures this)
+        }
+    });
+}
+
+handleDisconnect();
 
 
 const isnull = function (request) {
@@ -37,7 +61,7 @@ const isnull = function (request) {
 }
 
 app.get("/flights", (req, res) => {
-    db.query("SELECT * FROM flights LIMIT 100", (err, result) => {
+    connection.query("SELECT * FROM flights LIMIT 100", (err, result) => {
         if (err) {
             console.log(err);
         } else {
@@ -53,7 +77,7 @@ app.get("/", function (req, res) {
 const getDayofWeekfromCarrier = function (request) {
     let queryString = `SELECT carrier,DAYOFWEEK(schedule_date) as day from flights where carrier = '${request.carrier}'`;
     return new Promise((resolve, reject) => {
-        db.query(queryString,
+        connection.query(queryString,
             (err, result) => {
                 return err ? reject(err) : resolve(result);
             }
@@ -64,7 +88,7 @@ const getDayofWeekfromCarrier = function (request) {
 const getCarrieres = async function () {
     let queryString = `SELECT DISTINCT carrier FROM flights`
     return new Promise((resolve, reject) => {
-        db.query(queryString,
+        connection.query(queryString,
             (err, result) => {
                 return err ? reject(err) : resolve(result);
             }
@@ -75,7 +99,7 @@ const getCarrieres = async function () {
 const getAircraftType = function () {
     let queryString = `SELECT DISTINCT aircraft_type FROM flights`
     return new Promise((resolve, reject) => {
-        db.query(queryString,
+        connection.query(queryString,
             (err, result) => {
                 return err ? reject(err) : resolve(result);
             }
@@ -86,7 +110,7 @@ const getAircraftType = function () {
 const getDayofWeekfromAircraftType = function (request) {
     let queryString = `SELECT aircraft_type,DAYOFWEEK(schedule_date) as day from flights where aircraft_type = '${request.aircraft_type}'`;
     return new Promise((resolve, reject) => {
-        db.query(queryString,
+        connection.query(queryString,
             (err, result) => {
                 return err ? reject(err) : resolve(result);
             }
@@ -97,7 +121,7 @@ const getDayofWeekfromAircraftType = function (request) {
 const getAircraftTypeAndCarrieres = function () {
     let queryString = `SELECT carrier, aircraft_type FROM flights GROUP BY aircraft_type,carrier ORDER by carrier`;
     return new Promise((resolve, reject) => {
-        db.query(queryString,
+        connection.query(queryString,
             (err, result) => {
                 return err ? reject(err) : resolve(result);
             }
@@ -108,7 +132,7 @@ const getAircraftTypeAndCarrieres = function () {
 const getDayofWeekfromtAircraftTypeAndCarrieres = function (request) {
     let queryString = `select id,carrier,aircraft_type,DAYOFWEEK(schedule_date) as day from flights where carrier ='${request.carrier}' AND aircraft_type = '${request.aircraft_type}'`;
     return new Promise((resolve, reject) => {
-        db.query(queryString,
+        connection.query(queryString,
             (err, result) => {
                 return err ? reject(err) : resolve(result);
             }
@@ -123,7 +147,7 @@ const getWeekdayAndCarrier = function (request) {
                               schedule_date,DAYOFWEEK(schedule_date) as dayofweek,
                               HOUR(schedule_date) as hour_time from flights where DAYOFWEEK(schedule_date) = ${request} GROUP BY id ORDER by carrier`;
     return new Promise((resolve, reject) => {
-        db.query(queryString,
+        connection.query(queryString,
             (err, result) => {
                 return err ? reject(err) : resolve(result);
             }
@@ -168,7 +192,7 @@ app.post("/searchflight", function (req, res) {
     }
     querystring += parameter;
     console.log(querystring)
-    db.query(querystring,
+    connection.query(querystring,
         (err, result) => {
             if (err) {
                 console.log(err);
