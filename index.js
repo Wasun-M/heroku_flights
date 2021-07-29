@@ -26,7 +26,7 @@ const db_config = {
 //     database: "flight_information",
 // };
 
-var connection = mysql.createPool(db_config);
+var connection = mysql.createConnection(db_config);
 
 // function handleDisconnect() {
 //     connection = mysql.createPool(db_config);
