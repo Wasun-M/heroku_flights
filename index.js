@@ -26,7 +26,7 @@ const db_config = {
 //     database: "flight_information",
 // };
 
-var connection = mysql.createConnection(db_config);
+var connection = mysql.createPool(db_config);
 
 function handleDisconnect() {
     connection = mysql.createConnection(db_config); // Recreate the connection, since
@@ -57,12 +57,6 @@ const isnull = function (request) {
 }
 
 app.get("/flights", (req, res) => {
-    connection.connect(function (err) {
-        if (err) {
-            console.log('Connection is asleep (time to wake it up): ', err);
-            setTimeout(handleDisconnect, 1000);
-        }
-    });
     connection.query("SELECT * FROM flights LIMIT 100", (err, result) => {
         if (err) {
             console.log(err);
@@ -79,12 +73,6 @@ app.get("/", function (req, res) {
 const getDayofWeekfromCarrier = function (request) {
     let queryString = `SELECT carrier,DAYOFWEEK(schedule_date) as day from flights where carrier = '${request.carrier}'`;
     return new Promise((resolve, reject) => {
-        connection.connect(function (err) {
-            if (err) {
-                console.log('Connection is asleep (time to wake it up): ', err);
-                setTimeout(handleDisconnect, 1000);
-            }
-        });
         connection.query(queryString,
             (err, result) => {
                 return err ? reject(err) : resolve(result);
@@ -96,12 +84,6 @@ const getDayofWeekfromCarrier = function (request) {
 const getCarrieres = async function () {
     let queryString = `SELECT DISTINCT carrier FROM flights`
     return new Promise((resolve, reject) => {
-        connection.connect(function (err) {
-            if (err) {
-                console.log('Connection is asleep (time to wake it up): ', err);
-                setTimeout(handleDisconnect, 1000);
-            }
-        });
         connection.query(queryString,
             (err, result) => {
                 return err ? reject(err) : resolve(result);
@@ -113,12 +95,6 @@ const getCarrieres = async function () {
 const getAircraftType = function () {
     let queryString = `SELECT DISTINCT aircraft_type FROM flights`
     return new Promise((resolve, reject) => {
-        connection.connect(function (err) {
-            if (err) {
-                console.log('Connection is asleep (time to wake it up): ', err);
-                setTimeout(handleDisconnect, 1000);
-            }
-        });
         connection.query(queryString,
             (err, result) => {
                 return err ? reject(err) : resolve(result);
@@ -130,12 +106,6 @@ const getAircraftType = function () {
 const getDayofWeekfromAircraftType = function (request) {
     let queryString = `SELECT aircraft_type,DAYOFWEEK(schedule_date) as day from flights where aircraft_type = '${request.aircraft_type}'`;
     return new Promise((resolve, reject) => {
-        connection.connect(function (err) {
-            if (err) {
-                console.log('Connection is asleep (time to wake it up): ', err);
-                setTimeout(handleDisconnect, 1000);
-            }
-        });
         connection.query(queryString,
             (err, result) => {
                 return err ? reject(err) : resolve(result);
@@ -147,12 +117,6 @@ const getDayofWeekfromAircraftType = function (request) {
 const getAircraftTypeAndCarrieres = function () {
     let queryString = `SELECT carrier, aircraft_type FROM flights GROUP BY aircraft_type,carrier ORDER by carrier`;
     return new Promise((resolve, reject) => {
-        connection.connect(function (err) {
-            if (err) {
-                console.log('Connection is asleep (time to wake it up): ', err);
-                setTimeout(handleDisconnect, 1000);
-            }
-        });
         connection.query(queryString,
             (err, result) => {
                 return err ? reject(err) : resolve(result);
@@ -164,12 +128,6 @@ const getAircraftTypeAndCarrieres = function () {
 const getDayofWeekfromtAircraftTypeAndCarrieres = function (request) {
     let queryString = `select id,carrier,aircraft_type,DAYOFWEEK(schedule_date) as day from flights where carrier ='${request.carrier}' AND aircraft_type = '${request.aircraft_type}'`;
     return new Promise((resolve, reject) => {
-        connection.connect(function (err) {
-            if (err) {
-                console.log('Connection is asleep (time to wake it up): ', err);
-                setTimeout(handleDisconnect, 1000);
-            }
-        });
         connection.query(queryString,
             (err, result) => {
                 return err ? reject(err) : resolve(result);
@@ -185,12 +143,6 @@ const getWeekdayAndCarrier = function (request) {
                               schedule_date,DAYOFWEEK(schedule_date) as dayofweek,
                               HOUR(schedule_date) as hour_time from flights where DAYOFWEEK(schedule_date) = ${request} GROUP BY id ORDER by carrier`;
     return new Promise((resolve, reject) => {
-        connection.connect(function (err) {
-            if (err) {
-                console.log('Connection is asleep (time to wake it up): ', err);
-                setTimeout(handleDisconnect, 1000);
-            }
-        });
         connection.query(queryString,
             (err, result) => {
                 return err ? reject(err) : resolve(result);
@@ -235,13 +187,6 @@ app.post("/searchflight", function (req, res) {
         parameter += `${isnull(parameter) ? `` : ` AND `} aircraft_type = '${aircraft_type}'`;
     }
     querystring += parameter;
-
-    connection.connect(function (err) {
-        if (err) {
-            console.log('Connection is asleep (time to wake it up): ', err);
-            setTimeout(handleDisconnect, 1000);
-        }
-    });
     connection.query(querystring,
         (err, result) => {
             if (err) {
