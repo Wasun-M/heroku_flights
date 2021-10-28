@@ -3,7 +3,8 @@ const app = express();
 const mysql = require("mysql");
 const cors = require("cors");
 const http = require('http');
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT || 3001;
+const nodemailer = require('nodemailer');
 
 app.use(cors());
 app.use(express.json());
@@ -287,3 +288,40 @@ app.get("/getWeekdayAndCarrier", async (req, res) => {
     }
     res.send(ResultforReturn2);
 });
+
+app.post("/sendemail", async function (req, res) {
+    let requestData = req.body;
+    try {
+        let testAccount = await nodemailer.createTestAccount();
+
+        // create reusable transporter object using the default SMTP transport
+        let transporter = nodemailer.createTransport({
+            host: 'smtp.ethereal.email',
+            port: 587,
+            auth: {
+                user: 'deion.gislason@ethereal.email',
+                pass: 'HtagKMuPfVPC7JY8Z5'
+            }
+        });
+
+        let info = await transporter.sendMail({
+            from: '"Fred Foo 👻" <wasun_08@aewshop.com>', // sender address
+            to: requestData.email, // list of receivers
+            subject: "Hello ✔", // Subject line
+            text: "Hello world?", // plain text body
+            html: "<b>Hello world?</b>", // html body
+        });
+
+        console.log("Message sent: %s", info.messageId);
+        // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
+
+        // Preview only available when sending through an Ethereal account
+        console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+
+        res.send(info);
+    }
+    catch (error) {
+        console.log(error);
+        res.send(error);
+    }
+})
